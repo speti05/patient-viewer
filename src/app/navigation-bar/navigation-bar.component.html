@@ -1,0 +1,10 @@
+<nav>
+    <ng-container *ngFor="let menuItem of mainMenu">
+        <span
+            class="menu-item"
+            routerLink="{{menuItem.route}}"
+            routerLinkActive='active-link'>
+            <a>{{menuItem.text}}</a>
+        </span>
+    </ng-container>
+</nav>

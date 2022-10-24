@@ -1,0 +1,56 @@
+@first-row-width: 250px;
+@second-row-width: 150px;
+@third-row-width: 100px;
+@table-width: @first-row-width + @second-row-width + @third-row-width;
+
+table.patient-table {
+    background-color: rgb(238, 238, 238);
+    position: relative;
+    width: @table-width;
+
+    thead{
+        background-color: rgb(30,30,140);
+        position: absolute;
+        width: 100%;
+        //scrollbar fix
+        padding-right: 20px;
+
+        th {
+            text-align: left;
+            color: white;
+            padding: 15px;
+            
+            &:nth-child(1) {
+                width: @first-row-width;
+            }
+            &:nth-child(2) {
+                width: @second-row-width;
+            }
+            &:nth-child(3) {
+                width: @third-row-width;
+            }
+        }
+    }
+    div.patient-table-content {
+        margin-top: 55px;
+        height: 400px;
+        overflow-y: scroll;
+
+        tr {
+            td {
+                padding: 15px;
+
+                &:nth-child(1) {
+                    width: @first-row-width;
+                }
+                &:nth-child(2) {
+                    width: @second-row-width;
+                }
+                &:nth-child(3) {
+                    width: @third-row-width;
+                }
+            }
+        }
+    }
+
+}

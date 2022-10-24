@@ -1,0 +1,21 @@
+nav {
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(30,30,140);
+
+    span {
+        &:hover {
+            background-color: rgb(16,23,114);
+        }
+        &.active-link{
+            background-color: rgb(13,19,91);
+        }
+        a {
+            padding: 10px 40px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 3rem;
+            color: white
+        }
+    }
+} 

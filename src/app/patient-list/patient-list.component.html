@@ -1,0 +1,25 @@
+<app-patient-search (inputChanged)="handleSearch($event)"></app-patient-search>
+<table  class="patient-table">
+    <thead>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Gender</th>
+    </thead>
+
+    <div class="patient-table-content" *ngIf="filteredPatients.length > 0 else emptyList">
+        <table>
+            <tbody>
+                <tr *ngFor="let patient of filteredPatients">
+                    <td>{{patient.name}}</td>
+                    <td>{{patient.dateOfBirth}}</td>
+                    <td>{{patient.gender}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</table>
+<ng-template #emptyList>
+    <div class="patient-table-content" >
+        No Patients to show 😪
+    </div>
+</ng-template>
