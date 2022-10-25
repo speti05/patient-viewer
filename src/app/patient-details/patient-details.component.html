@@ -1,1 +1,31 @@
-<p>patient-details works!</p>
+<div class="patient-details-content" *ngIf="displayedPatient else emptyList">
+    <table>
+        <thead>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+        </thead>
+    
+        <tbody>
+            <tr>
+                <td>{{displayedPatient.name}}</td>
+                <td>{{displayedPatient.dateOfBirth}}</td>
+                <td>{{displayedPatient.gender}}</td>
+            </tr>
+        </tbody>
+
+    </table>
+</div>
+
+<ng-template #emptyList>
+    <div *ngIf="!isLoadInProgress" class="patient-details-content">
+        <div class="message">
+            No Patients to show 😪
+        </div>
+    </div>
+    <div *ngIf="isLoadInProgress" class="patient-details-content">
+        <div class="message">
+            <img src="../../assets/loading.gif">
+        </div>
+    </div>
+</ng-template>

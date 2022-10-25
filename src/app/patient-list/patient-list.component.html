@@ -4,6 +4,7 @@
         <th>Name</th>
         <th>Age</th>
         <th>Gender</th>
+        <th>Edit</th>
     </thead>
 
     <div class="patient-table-content" *ngIf="filteredPatients.length > 0 else emptyList">
@@ -13,13 +14,21 @@
                     <td>{{patient.name}}</td>
                     <td>{{patient.dateOfBirth}}</td>
                     <td>{{patient.gender}}</td>
+                    <td><a [routerLink]="routerLinkForDetailsState(patient.id)">✏️</a></td>
                 </tr>
             </tbody>
         </table>
     </div>
 </table>
 <ng-template #emptyList>
-    <div class="patient-table-content" >
-        No Patients to show 😪
+    <div *ngIf="!isLoadInProgress" class="patient-table-content">
+        <div class="message">
+            No Patients to show 😪
+        </div>
+    </div>
+    <div *ngIf="isLoadInProgress" class="patient-table-content">
+        <div class="message">
+            <img src="../../assets/loading.gif">
+        </div>
     </div>
 </ng-template>

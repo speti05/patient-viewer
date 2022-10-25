@@ -2,6 +2,7 @@
 @second-row-width: 150px;
 @third-row-width: 100px;
 @table-width: @first-row-width + @second-row-width + @third-row-width;
+@loading-image-size: 200px;
 
 table.patient-table {
     background-color: rgb(238, 238, 238);
@@ -49,6 +50,17 @@ table.patient-table {
                 &:nth-child(3) {
                     width: @third-row-width;
                 }
+            }
+        }
+
+        .message {
+            position: relative;
+            margin: calc(35% - @loading-image-size/2) auto auto auto;
+            width: @loading-image-size;
+
+            img {
+                height: @loading-image-size;
+                width: @loading-image-size;
             }
         }
     }

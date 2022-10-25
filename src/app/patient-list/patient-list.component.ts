@@ -11,14 +11,82 @@ export class PatientListComponent implements OnInit {
 
   public loadedPatients: Array<Patient> = [];
   public filteredPatients: Array<Patient> = [];
+  public isLoadInProgress: boolean = false;
 
   constructor(private patientService: PatientService) {
     
   }
 
   public ngOnInit(): void {
-    this.loadedPatients = this.patientService.loadPatients();
-    this.filteredPatients = this.loadedPatients;
+    // original synchron json loading 
+    // this.loadedPatients = this.patientService.loadPatients();
+    // this.filteredPatients = this.loadedPatients; 
+
+    // asynchron loading with promise, success and errorhandler in then
+    this.isLoadInProgress = true;
+
+    // loading resolving a single promise
+    // this.patientService
+    //   .loadPatientsWithPromise()
+    //   .then(this.loadWithPromiseSuccessHandler, this.loadWithPromiseErrorHandler);
+
+    // resolving 3 promises with Promise.all
+    // Promise.all([
+    //   this.patientService.loadPatientsWithPromise(),
+    //   this.patientService.loadPatientsWithPromise2(),
+    //   this.patientService.loadPatientsWithPromise3(),
+    // ])
+    //   .then(this.promiseAllLoadSuccessHandler, this.loadWithPromiseErrorHandler);
+
+    // resolving 3 promises with Promise.all
+    // Promise.race([
+    //   this.patientService.loadPatientsWithPromise(),
+    //   this.patientService.loadPatientsWithPromise2(),
+    //   this.patientService.loadPatientsWithPromise3(),
+    // ])
+    //   .then(this.loadWithPromiseSuccessHandler, this.loadWithPromiseErrorHandler);
+
+    // resolving 3 promises with Promise.all
+    this.loadPatientsWithAsyncAwait().then(()=> {
+      this.isLoadInProgress = false;
+    });
+    
+  }
+
+  private async loadPatientsWithAsyncAwait(): Promise<void> {
+    try {
+      const patients: Patient[] = await this.patientService.loadPatientsWithPromise();
+      const patients1: Patient[] = await this.patientService.loadPatientsWithPromise2();
+      const patients2: Patient[] = await this.patientService.loadPatientsWithPromise3();
+
+      this.loadedPatients =  this.filteredPatients = [...patients, ...patients1, ...patients2];
+      console.log("loadPatientsWithAsyncAwait result:");
+      console.dir(this.loadedPatients);
+    }
+    catch (e: any) {
+      console.error('Error While async/await loading');
+    }
+  }
+
+  private loadWithPromiseSuccessHandler = (loadedPatients: Array<Patient>)=>{
+    console.log("Patients Loaded!");
+    console.dir(loadedPatients);
+    this.filteredPatients = loadedPatients;
+    this.loadedPatients = loadedPatients;
+    this.isLoadInProgress = false;
+  }
+
+  private promiseAllLoadSuccessHandler = (loadedPatients: Array<Array<Patient>>)=>{
+    console.log("Patients Loaded with Promise.all!");
+    console.dir(loadedPatients);
+    this.loadedPatients = loadedPatients.flat(1);
+    this.filteredPatients = loadedPatients.flat(1);
+    this.isLoadInProgress = false;
+  }
+
+  private loadWithPromiseErrorHandler = (error: unknown)=>{
+    console.error(`Something wehnt wrong while loading Patients: ${JSON.stringify(error)}`);
+    this.isLoadInProgress = false;
   }
 
   public handleSearch = (value: string): void => {
@@ -27,4 +95,8 @@ export class PatientListComponent implements OnInit {
       return patient?.name?.includes(value);
     });
   };
+
+  public routerLinkForDetailsState(id: number): Array<string> {
+    return ['/details', (id as any as string)];
+  }
 }
