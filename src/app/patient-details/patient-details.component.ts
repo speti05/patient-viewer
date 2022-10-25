@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { LoadingService } from '../services/loading-service/loading.service';
 import { PatientService } from '../services/patient-service/patient-service';
 import { Patient } from '../types/patient';
 
@@ -13,30 +14,30 @@ export class PatientDetailsComponent implements OnInit, OnDestroy {
 
   public id: number = -1;
   public isLoadInProgress: boolean = false;
-  public displayedPatient!: Patient;
+  public displayedPatient!: Patient|undefined;
 
   public ngOnInit(): void {
-    this.isLoadInProgress = true;
-    this.patientService.getPatient(this.id).then(this.handlePatientLoadSuccess, this.handlePatientLoadError);
+    this.loadService.requestDisplayLoadingMask();
+    this.patientService.loadPatient(this.id as number).subscribe({
+        next: (patient: Patient|undefined) => {
+          this.displayedPatient = patient;
+          console.log("Found patient in patient details");
+          console.dir(this.displayedPatient);
+        },
+        error: (e) => {
+          console.error('Cant select patient for PatientDetails')
+        },
+         complete: () => {
+          this.loadService.requestHideLoadingMask();
+        }
+      });
   }
   
   public ngOnDestroy(): void {
   }
 
-  public handlePatientLoadSuccess = (loadedPat: Patient) => {
-    console.log("handlePatientLoadSuccess!");
-    console.dir(loadedPat);
-    this.displayedPatient = loadedPat;
-    this.isLoadInProgress = false;
-  };
-
-  public handlePatientLoadError = (error: any) => {
-    console.log("Unable to load Patient Details");
-    this.isLoadInProgress = false;
-  };
-
   public handleRouteParams(params: Params) {
-    this.id= params['id'];
+    this.id = params['id'] as number;
     console.log("resolved id in patient-details:", this.id);
   }
   public handleRouteParamsError(err: any) {
@@ -44,12 +45,12 @@ export class PatientDetailsComponent implements OnInit, OnDestroy {
   }
 
   constructor(private readonly route: ActivatedRoute,
-              private readonly patientService: PatientService) {
-    // this.routeParamsSubscription = this.route.params.subscribe(this.handleRouteParams, this.handleRouteParamsError);
+              private readonly patientService: PatientService,
+              private readonly loadService: LoadingService) {
     this.route.params.subscribe({
       next: (v) => this.handleRouteParams(v),
       error: (e) => this.handleRouteParamsError(e),
-      complete: () => console.info('complete') 
-  })
+      complete: () => console.info('completed route param query'),
+    });
   }
 }

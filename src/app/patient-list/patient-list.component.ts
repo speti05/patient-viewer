@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Observer } from 'rxjs';
+import { LoadingService } from '../services/loading-service/loading.service';
 import { PatientService} from '../services/patient-service/patient-service';
 import { Patient } from '../types/patient';
 
@@ -13,17 +15,25 @@ export class PatientListComponent implements OnInit {
   public filteredPatients: Array<Patient> = [];
   public isLoadInProgress: boolean = false;
 
-  constructor(private patientService: PatientService) {
-    
+  constructor(private readonly patientService: PatientService, private readonly loadService: LoadingService) { 
   }
 
   public ngOnInit(): void {
+    this.loadService.requestDisplayLoadingMask();
+
     // original synchron json loading 
     // this.loadedPatients = this.patientService.loadPatients();
     // this.filteredPatients = this.loadedPatients; 
 
     // asynchron loading with promise, success and errorhandler in then
-    this.isLoadInProgress = true;
+
+    // resolving with callback
+    // this.patientService.loadPatientsWithCallback((patient:Patient[])=>{
+    //   this.loadedPatients = patient;
+    //   this.filteredPatients = patient;
+    //   this.loadService.requestHideLoadingMask();
+    // });
+    
 
     // loading resolving a single promise
     // this.patientService
@@ -35,10 +45,9 @@ export class PatientListComponent implements OnInit {
     //   this.patientService.loadPatientsWithPromise(),
     //   this.patientService.loadPatientsWithPromise2(),
     //   this.patientService.loadPatientsWithPromise3(),
-    // ])
-    //   .then(this.promiseAllLoadSuccessHandler, this.loadWithPromiseErrorHandler);
+    // ]).then(this.promiseAllLoadSuccessHandler, this.loadWithPromiseErrorHandler);
 
-    // resolving 3 promises with Promise.all
+    // Racing  3 promises with Promise.all
     // Promise.race([
     //   this.patientService.loadPatientsWithPromise(),
     //   this.patientService.loadPatientsWithPromise2(),
@@ -47,10 +56,26 @@ export class PatientListComponent implements OnInit {
     //   .then(this.loadWithPromiseSuccessHandler, this.loadWithPromiseErrorHandler);
 
     // resolving 3 promises with Promise.all
-    this.loadPatientsWithAsyncAwait().then(()=> {
-      this.isLoadInProgress = false;
-    });
-    
+    // this.loadPatientsWithAsyncAwait().then(()=> {
+    //   this.loadService.requestHideLoadingMask();
+    // });
+
+    // getting patients as Observable 
+    const loadPatientsObserver: Observer<Patient[]> = {
+      next: (data: Patient[]) => {
+        this.loadService.requestDisplayLoadingMask();
+        this.loadedPatients = this.loadedPatients.concat(...data);
+        this.filteredPatients=this.loadedPatients;
+      },
+      error: () =>{
+        console.error("Error while loading Patients with observable in Patient-list");
+      },
+      complete: ()=>{
+        this.loadService.requestHideLoadingMask();
+        console.log("Loaded patient-list with Observable");
+      }
+    };
+    this.patientService.loadPatientsWithObservable().subscribe(loadPatientsObserver);
   }
 
   private async loadPatientsWithAsyncAwait(): Promise<void> {
@@ -69,11 +94,9 @@ export class PatientListComponent implements OnInit {
   }
 
   private loadWithPromiseSuccessHandler = (loadedPatients: Array<Patient>)=>{
-    console.log("Patients Loaded!");
-    console.dir(loadedPatients);
     this.filteredPatients = loadedPatients;
     this.loadedPatients = loadedPatients;
-    this.isLoadInProgress = false;
+    this.loadService.requestHideLoadingMask();
   }
 
   private promiseAllLoadSuccessHandler = (loadedPatients: Array<Array<Patient>>)=>{
@@ -81,12 +104,12 @@ export class PatientListComponent implements OnInit {
     console.dir(loadedPatients);
     this.loadedPatients = loadedPatients.flat(1);
     this.filteredPatients = loadedPatients.flat(1);
-    this.isLoadInProgress = false;
+    this.loadService.requestHideLoadingMask();
   }
 
   private loadWithPromiseErrorHandler = (error: unknown)=>{
     console.error(`Something wehnt wrong while loading Patients: ${JSON.stringify(error)}`);
-    this.isLoadInProgress = false;
+    this.loadService.requestHideLoadingMask();
   }
 
   public handleSearch = (value: string): void => {

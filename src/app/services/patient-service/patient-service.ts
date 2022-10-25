@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable, of, Subscriber } from 'rxjs';
 import { Patient } from 'src/app/types/patient';
 import * as SampleJson from '../../../assets/patients.json';
 import * as SampleJson2 from '../../../assets/patients2.json';
@@ -9,11 +10,19 @@ import * as SampleJson3 from '../../../assets/patients3.json';
 })
 export class PatientService {
 
+  private readonly LP_CB_TIMEOUT: number = 1000;
+  private readonly LP_1_TIMEOUT: number = 500;
+  private readonly LP_2_TIMEOUT: number = 800;
+  private readonly LP_3_TIMEOUT: number = 700;
+  private readonly LP_COMPLETE_TIMEOUT: number = 3000;
+
   private loadedPatients: Array<Patient> = [];
   private loadedPatients2: Array<Patient> = [];
   private loadedPatients3: Array<Patient> = [];
   // switch to true to simulate server error
-  private readonly SOMETHING_WENT_WRONG: boolean = false;
+  private readonly SOMETHING_WENT_WRONG_1: boolean = false;
+  private readonly SOMETHING_WENT_WRONG_2: boolean = false;
+  private readonly SOMETHING_WENT_WRONG_3: boolean = false;
 
   constructor() {
     this.mapFileToArray(SampleJson, this.loadedPatients);
@@ -34,17 +43,23 @@ export class PatientService {
     return this.loadedPatients;
   }
 
+  public loadPatientsWithCallback(callback: any)  {
+    setTimeout(()=>{
+      return callback(this.loadedPatients)
+    },this.LP_CB_TIMEOUT)
+  }
+
   // Promise1
   public loadPatientsWithPromise(): Promise<Array<Patient>> {
     return new Promise((resolve, reject) => {
       console.log("waiting for Patients... Patients");
 
       setTimeout(()=> {
-        if (this.SOMETHING_WENT_WRONG) {
+        if (this.SOMETHING_WENT_WRONG_1) {
           reject( "Server error!");
         }
         resolve(this.loadedPatients);
-      }, 5000);
+      }, this.LP_1_TIMEOUT);
     });
   }
 
@@ -54,11 +69,11 @@ export class PatientService {
       console.log("waiting for Patients...Patients2");
 
       setTimeout(()=> {
-        if (this.SOMETHING_WENT_WRONG) {
+        if (this.SOMETHING_WENT_WRONG_2) {
           reject( "Server error!");
         }
         resolve(this.loadedPatients2);
-      }, 4000);
+      }, this.LP_2_TIMEOUT);
     });
   }
 
@@ -68,47 +83,52 @@ export class PatientService {
         console.log("waiting for Patients...Patients3");
   
         setTimeout(()=> {
-          if (this.SOMETHING_WENT_WRONG) {
+          if (this.SOMETHING_WENT_WRONG_3) {
             reject( "Server error!");
           }
           resolve(this.loadedPatients3);
-        }, 3000);
+        }, this.LP_3_TIMEOUT);
       });
     }
 
-    // Promise 3
-    public getPatient(id: number): Promise<Patient> {
-      return new Promise((resolve, reject) => {
-        console.log("waiting for Patients...Patients3");
+    // Observable of patient arrays
+    public loadPatientsWithObservable(): Observable<Patient[]> {
+      return new Observable((subscriber: Subscriber<Patient[]>)=>{
+        setTimeout(()=>{
+          console.log("Loading data with Observable 1");
+          subscriber.next(this.loadedPatients)
+        }, this.LP_1_TIMEOUT);
+        setTimeout(()=>{
+          console.log("Loading data with Observable 2");
+          subscriber.next(this.loadedPatients2)
+        }, this.LP_2_TIMEOUT);
+        setTimeout(()=>{
+          console.log("Loading data with Observable 3");
+          subscriber.next(this.loadedPatients3);
+        }, this.LP_3_TIMEOUT);
+        setTimeout(()=>{
+          console.log("Loading data with Observable finished");
+          subscriber.complete();
+        }, this.LP_COMPLETE_TIMEOUT);
+      });
+    }
 
-  
-        Promise.all([
-          this.loadPatientsWithPromise(),
-          this.loadPatientsWithPromise2(),
-          this.loadPatientsWithPromise3(),
-        ]).then((values: Array<Array<Patient>>)=>{
-          console.log("Resolving All PAtientdata in getPatient Promise.all-s then");
-          const results: Patient[] = values
-            .flat(1);
-
-            console.log("id:", id); 
-            if (id === -1){
-                reject("Patient not found");
-            }
-            console.log("results"); 
-            console.dir(results); 
-          const filteredResults: Patient[] = results
-            .filter((value: Patient)=>{
-              return value.id !== id;
-            });
-
-            console.log("filteredResults"); 
-            console.dir(filteredResults); 
-          resolve(filteredResults[0]);
-        })
-        .catch(()=>{
-          console.error(`Error while loading Patient with id: ${id}`);
-        });
+    // Observable of patient arrays
+    public loadPatient(id: number): Observable<Patient|undefined> {
+      const source: Patient[] = [...this.loadedPatients,...this.loadedPatients2, ...this.loadedPatients3];
+      const foundPatient: Patient|undefined = source.find(
+          (patient: Patient) =>{
+            // Todo: ===, could not be converted route param to string, why?
+            return patient.id == id
+          }
+      );
+      console.log(`Patient found with id outside settimeout: ${foundPatient?.id}`);
+      return new Observable((subscriber: Subscriber<Patient>)=>{
+        setTimeout(()=>{
+          console.log(`Patient found with id: ${foundPatient?.id}`);
+          subscriber.next(foundPatient);
+          subscriber.complete();
+        }, this.LP_1_TIMEOUT);
       });
     }
 }

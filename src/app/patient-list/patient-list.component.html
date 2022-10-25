@@ -7,7 +7,7 @@
         <th>Edit</th>
     </thead>
 
-    <div class="patient-table-content" *ngIf="filteredPatients.length > 0 else emptyList">
+    <div class="patient-table-content" *ngIf="filteredPatients.length > 0 && !isLoadInProgress else emptyList">
         <table>
             <tbody>
                 <tr *ngFor="let patient of filteredPatients">
@@ -20,15 +20,11 @@
         </table>
     </div>
 </table>
+
 <ng-template #emptyList>
-    <div *ngIf="!isLoadInProgress" class="patient-table-content">
+    <div class="patient-table-content">
         <div class="message">
-            No Patients to show 😪
-        </div>
-    </div>
-    <div *ngIf="isLoadInProgress" class="patient-table-content">
-        <div class="message">
-            <img src="../../assets/loading.gif">
+            No Patient to show 😪
         </div>
     </div>
 </ng-template>

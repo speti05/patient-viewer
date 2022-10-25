@@ -24,9 +24,6 @@ export class NavigationBarComponent implements OnInit {
           text: 'Patients',
           route: 'patients',
       }, {
-          text: 'View Patient',
-          route: 'details',
-      }, {
           text: 'Create Patient',
           route: 'edit',
       }];
