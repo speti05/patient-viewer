@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { PatientHttpService } from '../services/patient-http-service/patient-http-service.service';
 import { PatientService } from '../services/patient-service/patient-service';
 import { Patient } from '../types/patient';
 
@@ -17,7 +18,10 @@ export class PatientDetailsComponent implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.isLoadInProgress = true;
-    this.patientService.getPatient(this.id).then(this.handlePatientLoadSuccess, this.handlePatientLoadError);
+    //this.patientService.getPatient(this.id).then(this.handlePatientLoadSuccess, this.handlePatientLoadError);
+    
+    // use HTTP
+    this.patientHttpService.getPatient(this.id).subscribe(patient => this.displayedPatient = patient);
   }
   
   public ngOnDestroy(): void {
@@ -43,8 +47,23 @@ export class PatientDetailsComponent implements OnInit, OnDestroy {
     console.error("Error while getting id from route params")
   }
 
+  public save(): void {
+    const newPatient: Patient = {
+      id: this.displayedPatient.id,
+      name: this.displayedPatient.name,
+      gender: this.displayedPatient.gender,
+      dateOfBirth: this.displayedPatient.dateOfBirth
+    };
+    this.patientHttpService.updatePatient(newPatient)
+      .subscribe(() => {
+        this.router.navigate(['']);
+      }); 
+  }
+
   constructor(private readonly route: ActivatedRoute,
-              private readonly patientService: PatientService) {
+              private readonly patientService: PatientService,
+              private readonly patientHttpService: PatientHttpService,
+              private readonly router: Router) {
     // this.routeParamsSubscription = this.route.params.subscribe(this.handleRouteParams, this.handleRouteParamsError);
     this.route.params.subscribe({
       next: (v) => this.handleRouteParams(v),

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PatientHttpService } from '../services/patient-http-service/patient-http-service.service';
 import { PatientService} from '../services/patient-service/patient-service';
 import { Patient } from '../types/patient';
 
@@ -13,7 +14,8 @@ export class PatientListComponent implements OnInit {
   public filteredPatients: Array<Patient> = [];
   public isLoadInProgress: boolean = false;
 
-  constructor(private patientService: PatientService) {
+  constructor(private patientService: PatientService,
+              private patientHttpService: PatientHttpService) {
     
   }
 
@@ -47,7 +49,14 @@ export class PatientListComponent implements OnInit {
     //   .then(this.loadWithPromiseSuccessHandler, this.loadWithPromiseErrorHandler);
 
     // resolving 3 promises with Promise.all
-    this.loadPatientsWithAsyncAwait().then(()=> {
+    //this.loadPatientsWithAsyncAwait().then(()=> {
+    //  this.isLoadInProgress = false;
+    //});
+
+    // use HTTP
+    this.patientHttpService.getPatients().subscribe(patients => {
+      this.loadedPatients = patients;
+      this.filteredPatients = patients;
       this.isLoadInProgress = false;
     });
     
@@ -99,4 +108,15 @@ export class PatientListComponent implements OnInit {
   public routerLinkForDetailsState(id: number): Array<string> {
     return ['/details', (id as any as string)];
   }
+
+  public deletePatient(patientId: number): void {
+    this.isLoadInProgress = true;
+    this.patientHttpService.deletePatient(patientId).subscribe();
+    this.patientHttpService.getPatients().subscribe(patients => {
+      this.loadedPatients = patients;
+      this.filteredPatients = patients;
+      this.isLoadInProgress = false;
+    });
+    
+  } 
 }

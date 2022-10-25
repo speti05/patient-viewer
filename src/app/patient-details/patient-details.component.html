@@ -4,13 +4,21 @@
             <th>Name</th>
             <th>Age</th>
             <th>Gender</th>
+            <th></th>
         </thead>
     
         <tbody>
             <tr>
-                <td>{{displayedPatient.name}}</td>
-                <td>{{displayedPatient.dateOfBirth}}</td>
-                <td>{{displayedPatient.gender}}</td>
+                <td><input [(ngModel)]="displayedPatient.name"/></td>
+                <td><input [(ngModel)]="displayedPatient.dateOfBirth"/></td>
+                <td>
+                    <select [(ngModel)]="displayedPatient.gender">
+                        <option>male</option>
+                        <option>female</option>
+                        <option>unknown</option>
+                    </select>
+                </td>
+                <td><span class="save-icon" (click)="save()">💾</span></td>
             </tr>
         </tbody>
 
