@@ -66,7 +66,7 @@ export class PatientHttpService {
   //////// Save methods //////////
 
   /** POST: add a new patient to the server */
-  addPatient(patient: Patient): Observable<Patient> {
+  addPatient(patient: Partial<Patient>): Observable<Patient> {
     return this.http.post<Patient>(this.patientsUrl, patient, this.httpOptions).pipe(
       tap((newPatient: Patient) => this.log(`added patient w/ id=${newPatient.id}`)),
       catchError(this.handleError<Patient>('addPatient'))

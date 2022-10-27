@@ -22,8 +22,7 @@ export class PatientEditorComponent implements OnInit {
   }
 
   public save(): void {
-    const newPatient: Patient = {
-      id: -1,
+    const newPatient: Partial<Patient> = {
       name: this.patientName as string,
       gender: this.gender as Gender,
       dateOfBirth: this.dateOfBirth as string
