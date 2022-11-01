@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { PatientHttpService } from '../services/patient-http-service/patient-http-service.service';
 import { LoadingService } from '../services/loading-service/loading.service';
+import { PatientHttpService } from '../services/patient-http-service/patient-http-service.service';
 import { PatientService } from '../services/patient-service/patient-service';
 import { Patient } from '../types/patient';
 
@@ -15,7 +15,7 @@ export class PatientDetailsComponent implements OnInit, OnDestroy {
 
   public id: number = -1;
   public isLoadInProgress: boolean = false;
-  public displayedPatient!: Patient|undefined;
+  public displayedPatient!: Patient;
 
   public ngOnInit(): void {
     this.isLoadInProgress = true;
