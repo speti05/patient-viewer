@@ -18,11 +18,26 @@ export class PatientDetailsComponent implements OnInit, OnDestroy {
   public displayedPatient!: Patient;
 
   public ngOnInit(): void {
-    this.isLoadInProgress = true;
-    //this.patientService.getPatient(this.id).then(this.handlePatientLoadSuccess, this.handlePatientLoadError);
+    this.loadService.requestDisplayLoadingMask();
+    // this.patientService.loadPatient(this.id as number).subscribe({
+    //     next: (patient: Patient|undefined) => {
+    //       this.displayedPatient = patient;
+    //       console.log("Found patient in patient details");
+    //       console.dir(this.displayedPatient);
+    //     },
+    //     error: (e) => {
+    //       console.error('Cant select patient for PatientDetails')
+    //     },
+    //      complete: () => {
+    //       this.loadService.requestHideLoadingMask();
+    //     }
+    //   });
     
     // use HTTP
-    this.patientHttpService.getPatient(this.id).subscribe(patient => this.displayedPatient = patient);
+    this.patientHttpService.getPatient(this.id).subscribe(patient => {
+      this.displayedPatient = patient;
+      this.loadService.requestHideLoadingMask();
+    });
   }
   
   public ngOnDestroy(): void {
