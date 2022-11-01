@@ -1,1 +1,24 @@
-<p>patient-editor works!</p>
+<fieldset>
+    <table>
+        <tr>
+            <td><label>Name:</label></td>
+            <td><input [(ngModel)]="patientName"/></td>
+        </tr>
+        <tr>
+            <td><label>Gender:</label></td>
+            <td>
+                <select [(ngModel)]="gender">
+                    <option>male</option>
+                    <option>female</option>
+                    <option>unknown</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label>Date of birth:</label></td>
+            <td><input [(ngModel)]="dateOfBirth"/></td>
+        </tr>
+    </table>
+    <span class="save-icon" (click)="save()">💾</span>
+</fieldset>
+

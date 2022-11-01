@@ -1,0 +1,7 @@
+<div class="message-container" #messageContainer (dblclick)="clearMessages()">
+    <div class="message" *ngFor="let message of messages" class="{{message.method}}">
+        <span class="id">{{message.id | number:'2.0'}}</span>
+        <span class="timestamp">{{message.timestamp | date:'yyyy-MM-dd HH:mm:ss.SSS'}}</span>
+        <span class="message-text">{{message.message}}</span>
+    </div>
+</div>

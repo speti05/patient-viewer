@@ -1,23 +1,31 @@
-@table-width: 500px;
-
-.patient-details-content table {
-    width: 500px;
-    background-color: rgb(238, 238, 238);
-
-    thead{
-        background-color: rgb(30,30,140);
-        padding-right: 20px;
-
-        th {
-            text-align: left;
-            color: white;
-            padding: 15px;
-        }
-    }
-    tbody {
-        tr {
-            td {
+.patient-details-content {
+    table {
+        background-color: rgb(238, 238, 238);
+    
+        thead{
+            background-color: rgb(30,30,140);
+            padding-right: 20px;
+    
+            th {
+                text-align: left;
+                color: white;
                 padding: 15px;
+            }
+        }
+        tbody {
+    
+            tr {
+                td {
+                    padding: 15px;
+
+                    .save-icon {
+                        &:hover {
+                            cursor: pointer;
+                            background-color: #3276ad;
+                            border-radius: 5px;
+                        } 
+                    }   
+                }
             }
         }
     }

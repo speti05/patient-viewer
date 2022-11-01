@@ -9,6 +9,11 @@ import { PatientEditorComponent } from './patient-editor/patient-editor.componen
 import { PatientDetailsComponent } from './patient-details/patient-details.component';
 import { PatientSearchComponent } from './patient-search/patient-search.component';
 import { FormsModule } from '@angular/forms';
+import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
+import { InMemoryDataService } from './services/patient-http-service/in-memory-data.service';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import { MessageComponent } from './message/message.component';
 
 @NgModule({
   declarations: [
@@ -17,14 +22,21 @@ import { FormsModule } from '@angular/forms';
     PatientListComponent,
     PatientEditorComponent,
     PatientDetailsComponent,
-    PatientSearchComponent
+    PatientSearchComponent,
+    MessageComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule,
+    HttpClientInMemoryWebApiModule.forRoot(
+      InMemoryDataService, { dataEncapsulation: false }
+    )
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: LoggingInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
   // schemas: [
   //   CUSTOM_ELEMENTS_SCHEMA

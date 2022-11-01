@@ -1,7 +1,9 @@
-@first-row-width: 250px;
-@second-row-width: 150px;
-@third-row-width: 100px;
-@table-width: @first-row-width + @second-row-width + @third-row-width;
+@first-column-width: 250px;
+@second-column-width: 150px;
+@third-column-width: 100px;
+@operation-column-width: 25px;
+@table-width: @first-column-width + @second-column-width + @third-column-width + @operation-column-width + @operation-column-width;
+@loading-image-size: 200px;
 
 table.patient-table {
     background-color: rgb(238, 238, 238);
@@ -21,13 +23,17 @@ table.patient-table {
             padding: 15px;
             
             &:nth-child(1) {
-                width: @first-row-width;
+                width: @first-column-width;
             }
             &:nth-child(2) {
-                width: @second-row-width;
+                width: @second-column-width;
             }
             &:nth-child(3) {
-                width: @third-row-width;
+                width: @third-column-width;
+            }
+            &:nth-child(4),
+            &:nth-child(5) {
+                width: @operation-column-width;
             }
         }
     }
@@ -41,13 +47,29 @@ table.patient-table {
                 padding: 15px;
 
                 &:nth-child(1) {
-                    width: @first-row-width;
+                    width: @first-column-width;
                 }
                 &:nth-child(2) {
-                    width: @second-row-width;
+                    width: @second-column-width;
                 }
                 &:nth-child(3) {
-                    width: @third-row-width;
+                    width: @third-column-width;
+                }
+                &:nth-child(4),
+                &:nth-child(5) {
+                    width: @operation-column-width;
+                }
+                .delete-icon,
+                a {
+                    &:hover {
+                        background-color: #3276ad;
+                        border-radius: 5px;
+                    }    
+                }
+                .delete-icon {
+                    &:hover {
+                        cursor: pointer;
+                    }  
                 }
             }
         }

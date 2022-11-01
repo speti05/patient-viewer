@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { PatientHttpService } from '../services/patient-http-service/patient-http-service.service';
 import { Observer } from 'rxjs';
 import { LoadingService } from '../services/loading-service/loading.service';
 import { PatientService} from '../services/patient-service/patient-service';
@@ -15,7 +16,9 @@ export class PatientListComponent implements OnInit {
   public filteredPatients: Array<Patient> = [];
   public isLoadInProgress: boolean = false;
 
-  constructor(private readonly patientService: PatientService, private readonly loadService: LoadingService) { 
+  constructor(private readonly patientService: PatientService,
+              private patientHttpService: PatientHttpService, 
+              private readonly loadService: LoadingService) { 
   }
 
   public ngOnInit(): void {
@@ -61,21 +64,28 @@ export class PatientListComponent implements OnInit {
     // });
 
     // getting patients as Observable 
-    const loadPatientsObserver: Observer<Patient[]> = {
-      next: (data: Patient[]) => {
-        this.loadService.requestDisplayLoadingMask();
-        this.loadedPatients = this.loadedPatients.concat(...data);
-        this.filteredPatients=this.loadedPatients;
-      },
-      error: () =>{
-        console.error("Error while loading Patients with observable in Patient-list");
-      },
-      complete: ()=>{
-        this.loadService.requestHideLoadingMask();
-        console.log("Loaded patient-list with Observable");
-      }
-    };
-    this.patientService.loadPatientsWithObservable().subscribe(loadPatientsObserver);
+    // const loadPatientsObserver: Observer<Patient[]> = {
+    //   next: (data: Patient[]) => {
+    //     this.loadService.requestDisplayLoadingMask();
+    //     this.loadedPatients = this.loadedPatients.concat(...data);
+    //     this.filteredPatients=this.loadedPatients;
+    //   },
+    //   error: () =>{
+    //     console.error("Error while loading Patients with observable in Patient-list");
+    //   },
+    //   complete: ()=>{
+    //     this.loadService.requestHideLoadingMask();
+    //     console.log("Loaded patient-list with Observable");
+    //   }
+    // };
+    // this.patientService.loadPatientsWithObservable().subscribe(loadPatientsObserver);
+
+    // use HTTP
+    this.patientHttpService.getPatients().subscribe(patients => {
+      this.loadedPatients = patients;
+      this.filteredPatients = patients;
+      this.loadService.requestHideLoadingMask();
+    });
   }
 
   private async loadPatientsWithAsyncAwait(): Promise<void> {
@@ -122,4 +132,15 @@ export class PatientListComponent implements OnInit {
   public routerLinkForDetailsState(id: number): Array<string> {
     return ['/details', (id as any as string)];
   }
+
+  public deletePatient(patientId: number): void {
+    this.isLoadInProgress = true;
+    this.patientHttpService.deletePatient(patientId).subscribe();
+    this.patientHttpService.getPatients().subscribe(patients => {
+      this.loadedPatients = patients;
+      this.filteredPatients = patients;
+      this.isLoadInProgress = false;
+    });
+    
+  } 
 }
