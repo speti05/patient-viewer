@@ -1,4 +1,4 @@
-<div class="patient-details-content" *ngIf="displayedPatient else emptyList">
+<div class="patient-details-content">
     <table>
         <thead>
             <th>Name</th>
@@ -6,8 +6,7 @@
             <th>Gender</th>
             <th></th>
         </thead>
-    
-        <tbody>
+        <tbody *ngIf="displayedPatient else emptyList">
             <tr>
                 <td><input [(ngModel)]="displayedPatient.name"/></td>
                 <td><input [(ngModel)]="displayedPatient.dateOfBirth"/></td>
@@ -21,19 +20,11 @@
                 <td><span class="save-icon" (click)="save()">💾</span></td>
             </tr>
         </tbody>
-
     </table>
 </div>
 
 <ng-template #emptyList>
-    <div *ngIf="!isLoadInProgress" class="patient-details-content">
-        <div class="message">
-            No Patients to show 😪
-        </div>
-    </div>
-    <div *ngIf="isLoadInProgress" class="patient-details-content">
-        <div class="message">
-            <img src="../../assets/loading.gif">
-        </div>
+    <div class="message">
+        No Patients to show 😪
     </div>
 </ng-template>

@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { PatientHttpService } from '../services/patient-http-service/patient-http-service.service';
+import { LoadingService } from '../services/loading-service/loading.service';
 import { PatientService } from '../services/patient-service/patient-service';
 import { Patient } from '../types/patient';
 
@@ -14,7 +15,7 @@ export class PatientDetailsComponent implements OnInit, OnDestroy {
 
   public id: number = -1;
   public isLoadInProgress: boolean = false;
-  public displayedPatient!: Patient;
+  public displayedPatient!: Patient|undefined;
 
   public ngOnInit(): void {
     this.isLoadInProgress = true;
@@ -27,20 +28,8 @@ export class PatientDetailsComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
   }
 
-  public handlePatientLoadSuccess = (loadedPat: Patient) => {
-    console.log("handlePatientLoadSuccess!");
-    console.dir(loadedPat);
-    this.displayedPatient = loadedPat;
-    this.isLoadInProgress = false;
-  };
-
-  public handlePatientLoadError = (error: any) => {
-    console.log("Unable to load Patient Details");
-    this.isLoadInProgress = false;
-  };
-
   public handleRouteParams(params: Params) {
-    this.id= params['id'];
+    this.id = params['id'] as number;
     console.log("resolved id in patient-details:", this.id);
   }
   public handleRouteParamsError(err: any) {
@@ -63,12 +52,12 @@ export class PatientDetailsComponent implements OnInit, OnDestroy {
   constructor(private readonly route: ActivatedRoute,
               private readonly patientService: PatientService,
               private readonly patientHttpService: PatientHttpService,
-              private readonly router: Router) {
-    // this.routeParamsSubscription = this.route.params.subscribe(this.handleRouteParams, this.handleRouteParamsError);
+              private readonly router: Router,
+              private readonly loadService: LoadingService) {
     this.route.params.subscribe({
       next: (v) => this.handleRouteParams(v),
       error: (e) => this.handleRouteParamsError(e),
-      complete: () => console.info('complete') 
-  })
+      complete: () => console.info('completed route param query'),
+    });
   }
 }

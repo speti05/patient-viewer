@@ -3,4 +3,6 @@
   <router-outlet></router-outlet>
   <app-message></app-message>
 </div>
-
+<div class="loadMask" *ngIf="isLoadMaskVisible">
+  <img src="../../assets/loading.gif">
+</div>
